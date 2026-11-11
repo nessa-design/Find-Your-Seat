@@ -32,13 +32,21 @@ svg text{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;fill:var
 @keyframes p{50%{transform:scale(1.12)}}
 .f{fill:var(--furn);stroke:var(--mut);stroke-width:1}
 .leg{color:var(--mut);font-size:13px;margin:6px 0 0}
+#th{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:5;width:42px;height:42px;border-radius:50%;border:1px solid var(--accent);background:var(--card);font-size:20px;cursor:pointer}
+.th2{font-family:'Great Vibes',cursive;font-size:32px;color:var(--accent);margin:0 0 8px}
+.row{background:var(--card);border-radius:10px;padding:10px 16px;margin-bottom:6px;text-align:left;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.btn{margin:10px auto 0;padding:8px 16px;border-radius:20px;border:1px solid var(--accent);background:var(--card);color:var(--fg);font-family:inherit;font-size:15px;cursor:pointer}
+:root[data-theme="dark"] body{background:var(--bg)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body{background:var(--bg)}}
 </style></head><body>
 <p class="verse">When the time is right, I, the Lord, will make it happen.</p><p class="ref">Isaiah 60:22</p>
 <div class="script">A Covenant in Christ</div><div class="names">DANIEL JOHN AGUSPINA<i>and</i>VANESSA JEN GABIANA</div><div class="date">20 · NOVEMBER · 2026</div><div class="orn"></div>
 <p class="s">Type your name to find your table</p>
+<button id="th" aria-label="Switch light or dark mode">🌙</button>
 <input id="q" type="text" placeholder="e.g. Maria" autocomplete="off">
 <div id="r"></div>
 <div id="map"><svg id="svg" viewBox="350 30 890 670"></svg></div>
+<button id="zb" class="btn" style="display:none">Show full floor plan</button>
 <p class="leg">Tap a table to see who is seated there</p>
 <script>
 const T={1:["Eva Marie Cuizon","Ken Cuizon","Fr. Monico Catubig","Josephine Gabiana","Carlo Gabiana","Reca Jan Frances Pamaran","Hazel Anne Javier","Reiner Javier","Adam Joseph Aguspina","Charlyn \"Chan\" Aguspina"],
@@ -54,7 +62,10 @@ const T={1:["Eva Marie Cuizon","Ken Cuizon","Fr. Monico Catubig","Josephine Gabi
 const R={3:[751,498],4:[897,431],5:[748,171],6:[897,97],7:[902,562],8:[1054,497],9:[897,241],10:[1058,171]};
 const V={1:[537,398,112,48],2:[537,222,112,50]};
 const G=[];for(const t in T)T[t].forEach(n=>G.push({n,t:+t}));
-let sel=0;
+let sel=0,zoomOn=true,vb=[350,30,890,670],raf;
+const B=[350,30,890,670],svgEl=document.getElementById('svg'),zb=document.getElementById('zb'),th=document.getElementById('th');
+function box(){if(!sel||!zoomOn)return B;const c=R[sel]?R[sel]:[V[sel][0]+V[sel][2]/2,V[sel][1]+V[sel][3]/2],w=340,h=w*670/890;return [Math.min(Math.max(c[0]-w/2,B[0]),B[0]+B[2]-w),Math.min(Math.max(c[1]-h/2,B[1]),B[1]+B[3]-h),w,h]}
+function go(t){cancelAnimationFrame(raf);const f=vb.slice(),s0=performance.now();(function st(n){const k=Math.min((n-s0)/500,1),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;vb=f.map((v,i)=>v+(t[i]-v)*e);svgEl.setAttribute('viewBox',vb.join(' '));if(k<1)raf=requestAnimationFrame(st)})(s0)}
 function draw(){let s='';
 s+='<rect class="f" x="505" y="50" width="168" height="38" rx="4"/><text x="589" y="74" text-anchor="middle" font-size="14">SOUND TECH</text>';
 s+='<rect x="364" y="142" width="40" height="388" fill="#b5b5b5" rx="3"/><text transform="translate(390 336) rotate(-90)" text-anchor="middle" font-size="14" style="fill:#fff">BACKDROP / STAGE</text>';
@@ -71,12 +82,12 @@ s+='<g class="'+(sel&&!on?'dim':'')+'" data-t="'+k+'"><rect class="tb '+(on?'hl 
 for(const k in R){const [x,y]=R[k],on=sel==k;let d='';
 for(let i=0;i<10;i++){const a=i*Math.PI/5;d+='<circle cx="'+(x+Math.cos(a)*52).toFixed(1)+'" cy="'+(y+Math.sin(a)*52).toFixed(1)+'" r="8" fill="'+(on?'var(--accent)':'#6b4a3a')+'"/>';}
 s+='<g class="'+(sel&&!on?'dim':'')+'" data-t="'+k+'">'+d+'<circle class="tb '+(on?'hl pulse':'')+'" cx="'+x+'" cy="'+y+'" r="38"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-size="15" class="'+(on?'hlt':'')+'">Table '+k+'</text></g>';}
-document.getElementById('svg').innerHTML=s;
-document.querySelectorAll('#svg g[data-t]').forEach(g=>g.onclick=()=>{sel=+g.dataset.t;draw();showTable()});}
-function showTable(){r.innerHTML='<div class="c on"><span>'+T[sel].join(', ')+'</span><span class="t">T'+sel+'</span></div>'}
+svgEl.innerHTML=s;go(box());zb.style.display=sel?'inline-block':'none';zb.textContent=zoomOn?'Show full floor plan':'Zoom to table';
+document.querySelectorAll('#svg g[data-t]').forEach(g=>g.onclick=()=>{sel=+g.dataset.t;zoomOn=true;draw();showTable()});}
+function showTable(){r.innerHTML='';const h=document.createElement('div');h.className='th2';h.textContent='Table '+sel+(sel<3?' (VIP)':'');r.appendChild(h);T[sel].forEach((n,i)=>{const d=document.createElement('div');d.className='row';d.textContent=(i+1)+'. '+n;r.appendChild(d)})}
 const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
 const q=document.getElementById("q"),r=document.getElementById("r");
-q.oninput=()=>{const v=norm(q.value);r.innerHTML="";sel=0;
+q.oninput=()=>{const v=norm(q.value);r.innerHTML="";sel=0;zoomOn=true;
 if(v.length<2){draw();return}
 const parts=v.split(" ");
 const m=G.filter(g=>{const n=norm(g.n);return parts.every(p=>n.includes(p))}).slice(0,8);
@@ -87,4 +98,8 @@ d.innerHTML='<span></span><span class="t">Table '+g.t+'</span>';d.firstChild.tex
 d.onclick=()=>{sel=g.t;[...r.children].forEach(c=>c.classList.remove("on"));d.classList.add("on");draw()};r.appendChild(d)});
 draw()};
 draw();
+const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t=='dark':matchMedia('(prefers-color-scheme:dark)').matches};
+const setIcon=()=>{th.textContent=isDark()?'☀️':'🌙'};
+th.onclick=()=>{document.documentElement.dataset.theme=isDark()?'light':'dark';setIcon()};setIcon();
+zb.onclick=()=>{zoomOn=!zoomOn;draw()};
 </script></body></html>
