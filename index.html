@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find Your Seat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Great+Vibes&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f8f3ee;--fg:#5c4331;--card:#fffdf9;--accent:#6f8a62;--mut:#8b7560;--tbl:#cfdcc3;--room:#f4eee6;--furn:#e6dccf;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1e1a19;--fg:#f1e8e2;--card:#2a2423;--accent:#9fb890;--mut:#b3a39b;--tbl:#4a5a44;--room:#26201f;--furn:#3a3230}}
+:root[data-theme="dark"]{--bg:#1e1a19;--fg:#f1e8e2;--card:#2a2423;--accent:#9fb890;--mut:#b3a39b;--tbl:#4a5a44;--room:#26201f;--furn:#3a3230}
+body{margin:0;background:radial-gradient(ellipse at 15% 0%,rgba(190,205,230,.45),transparent 55%),radial-gradient(ellipse at 90% 12%,rgba(245,205,185,.4),transparent 50%),radial-gradient(ellipse at 50% 100%,rgba(185,205,175,.35),transparent 60%),var(--bg);color:var(--fg);font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;font-size:18px;text-align:center;padding:30px 14px}
+.verse{font-size:26px;line-height:1.2;margin:0 auto;max-width:360px;font-weight:500}.ref{font-family:Montserrat,sans-serif;font-style:italic;font-size:13px;color:var(--mut);margin:8px 0 10px}
+.script{font-family:'Great Vibes',cursive;font-size:44px;color:var(--accent);margin:2px 0 6px;line-height:1.1}
+.names{font-family:Montserrat,sans-serif;letter-spacing:.14em;font-size:12px;line-height:1.9}.names i{display:block;font-size:10px;letter-spacing:.3em}
+.date{font-family:Montserrat,sans-serif;font-weight:500;letter-spacing:.2em;font-size:15px;margin:16px 0 4px}
+.orn{width:150px;border-top:1px solid var(--mut);margin:12px auto 18px;opacity:.6}
+h1{font-weight:400;font-size:30px;margin:6px 0 4px}
+p.s{color:var(--mut);margin:0 0 18px}
+input{width:100%;max-width:420px;padding:14px 16px;font-size:17px;border:1px solid var(--accent);border-radius:12px;background:var(--card);color:var(--fg);box-sizing:border-box}
+#r{max-width:420px;margin:14px auto}
+.c{display:flex;justify-content:space-between;align-items:center;background:var(--card);border-radius:12px;padding:12px 16px;margin-bottom:8px;text-align:left;box-shadow:0 1px 4px rgba(0,0,0,.08);cursor:pointer;border:2px solid transparent}
+.c.on{border-color:var(--accent)}
+.t{font-size:20px;color:var(--accent);white-space:nowrap}
+.m{color:var(--mut)}
+#map{max-width:760px;margin:10px auto 0;background:var(--room);border-radius:14px;padding:6px}
+svg{width:100%;height:auto;display:block}
+svg text{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;fill:var(--fg)}
+.tb{fill:var(--tbl);stroke:var(--accent);stroke-width:1.5;transition:all .3s}
+.dim{opacity:.35}
+.hl{fill:var(--accent);stroke:var(--fg);stroke-width:3}
+.hlt{fill:#fff!important;font-weight:bold}
+.pulse{animation:p 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes p{50%{transform:scale(1.12)}}
+.f{fill:var(--furn);stroke:var(--mut);stroke-width:1}
+.leg{color:var(--mut);font-size:13px;margin:6px 0 0}
+</style></head><body>
+<p class="verse">When the time is right, I, the Lord, will make it happen.</p><p class="ref">Isaiah 60:22</p>
+<div class="script">A Covenant in Christ</div><div class="names">DANIEL JOHN AGUSPINA<i>and</i>VANESSA JEN GABIANA</div><div class="date">20 · NOVEMBER · 2026</div><div class="orn"></div>
+<p class="s">Type your name to find your table</p>
+<input id="q" type="text" placeholder="e.g. Maria" autocomplete="off">
+<div id="r"></div>
+<div id="map"><svg id="svg" viewBox="350 30 890 670"></svg></div>
+<p class="leg">Tap a table to see who is seated there</p>
+<script>
+const T={1:["Eva Marie Cuizon","Ken Cuizon","Fr. Monico Catubig","Josephine Gabiana","Carlo Gabiana","Reca Jan Frances Pamaran","Hazel Anne Javier","Reiner Javier","Adam Joseph Aguspina","Charlyn \"Chan\" Aguspina"],
+2:["Daniel John Aguspina","Vanessa Jen Gabiana","Melojen Gabiana","Giovanni Gabiana","Alejandro Aguspina Jr","Helen Aguspina","Stephanie De Las Peñas","Dr. Glenn De Las Peñas","Carlos Quibod","Longina Quibod"],
+3:["Joshua Gabiana","Zefrah Gamao","Blue Gabiana","Liam Uri Gabiana","Jimmy Fiel","Rhenald Gabiana","Khate Jazdyne Gabiana","Julliane Mae Gabiana","Melvie Gae Alolor","Janine Alolor"],
+4:["David Paul Aguspina","Jhana Jane Abellanosa","Jabez Andrew Aguspina","Joann Alfante","Alessandra Therese Aguspina","Joel Philip Aguspina","Daven Charles Ponce","Trisha Claire Carcedo","Anton Ponce","Melchizedek Ancero"],
+5:["Jackylyn Premacio","Joseph Arong","Lino Binoya","Kimberly Anne Ponce","James Adam Ponce","Maribeth Navarro","Roselynne Sagrado","Maria Martha Acla","Mario Regual","Cristy Regual"],
+6:["Rhianna Bernadette Gabrinez","Jemaima Gabiana","Jeran Cordova","Adona \"Nat\" Domitita","Jhitter Cordova","Jennifer Cordova","Debbie Jenkins","Marissa Mowery"],
+7:["John Rolly Ponce","Gladys Ponce","Wilfredo Ponce","Mercy Tagget","Edward Carcedo","Romel Ponce","Victito Ponce","Analyn Ponce","Roger Ponce","Maricel Teopiz","Daryl Teopiz"],
+8:["Mansueta \"Sweetie\" Narvasa","Carlo Narvasa","Anna Mae Sol Briones","Cesar Briones","Ronnie Gonzaga","Helen Gonzaga","Fritz Acedo","Jennifer Acedo","Marbert Rañen","Frances Faith Rañen","Irene Rañen"],
+9:["Alfredo Salomon","Jerelle Mangila","Shaun Anly Cabahug","Trixies Sinadjan","Mark Louwe Sinadjan","Clementina Alesna","Narcisa Yunson","Eduardo Serato"],
+10:["Maxie Moria","Marienel Gualberto","Justina Sabanal","Julit Jainar"]};
+const R={3:[751,498],4:[897,431],5:[748,171],6:[897,97],7:[902,562],8:[1054,497],9:[897,241],10:[1058,171]};
+const V={1:[537,398,112,48],2:[537,222,112,50]};
+const G=[];for(const t in T)T[t].forEach(n=>G.push({n,t:+t}));
+let sel=0;
+function draw(){let s='';
+s+='<rect class="f" x="505" y="50" width="168" height="38" rx="4"/><text x="589" y="74" text-anchor="middle" font-size="14">SOUND TECH</text>';
+s+='<rect x="364" y="142" width="40" height="388" fill="#b5b5b5" rx="3"/><text transform="translate(390 336) rotate(-90)" text-anchor="middle" font-size="14" style="fill:#fff">BACKDROP / STAGE</text>';
+s+='<polygon class="f" points="440,125 498,125 498,180 456,195 414,160"/><text x="462" y="160" text-anchor="middle" font-size="12">Band</text>';
+s+='<rect class="f" x="460" y="300" width="46" height="76" rx="3"/><text transform="translate(487 338) rotate(-90)" text-anchor="middle" font-size="11">COCKTAIL</text>';
+s+='<polygon class="f" points="463,430 505,468 463,510 421,468"/><text x="463" y="466" text-anchor="middle" font-size="10">GIFT &amp;</text><text x="463" y="478" text-anchor="middle" font-size="10">CAKE</text>';
+s+='<rect class="f" x="1158" y="78" width="54" height="126" rx="3"/><text transform="translate(1190 141) rotate(-90)" text-anchor="middle" font-size="13">PHOTOBOOTH</text>';
+s+='<rect x="1220" y="260" width="24" height="155" fill="#bfd9e6" stroke="#8fb4c6" rx="3"/><text transform="translate(1236 338) rotate(-90)" text-anchor="middle" font-size="12" style="fill:#3a4a52">MAIN ENTRANCE</text>';
+s+='<defs><linearGradient id="fg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f58a4a"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect x="1172" y="451" width="40" height="230" fill="url(#fg)" rx="3"/><text transform="translate(1198 566) rotate(-90)" text-anchor="middle" font-size="13" style="fill:#fff">FOOD STATION</text>';
+s+='<path d="M583 679V640a29 29 0 0 1 58 0V679z" fill="#ff5fa2"/><text x="612" y="665" text-anchor="middle" font-size="11" style="fill:#fff">EXIT</text><text x="612" y="607" text-anchor="middle" font-size="12" class="m">SIDE EXIT</text>';
+[766,1032].forEach(x=>s+='<path d="M'+(x-23)+' 679V655a23 23 0 0 1 46 0V679z" fill="#aaa"/><text x="'+x+'" y="670" text-anchor="middle" font-size="14" style="fill:#fff">X</text>');
+for(const k in V){const [x,y,w,h]=V[k],on=sel==k;
+s+='<g class="'+(sel&&!on?'dim':'')+'" data-t="'+k+'"><rect class="tb '+(on?'hl pulse':'')+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="4"/><text x="'+(x+w/2)+'" y="'+(y+h/2-2)+'" text-anchor="middle" font-size="15" class="'+(on?'hlt':'')+'">Table '+k+'</text><text x="'+(x+w/2)+'" y="'+(y+h/2+15)+'" text-anchor="middle" font-size="11" class="'+(on?'hlt':'')+'">VIP</text></g>';}
+for(const k in R){const [x,y]=R[k],on=sel==k;let d='';
+for(let i=0;i<10;i++){const a=i*Math.PI/5;d+='<circle cx="'+(x+Math.cos(a)*52).toFixed(1)+'" cy="'+(y+Math.sin(a)*52).toFixed(1)+'" r="8" fill="'+(on?'var(--accent)':'#6b4a3a')+'"/>';}
+s+='<g class="'+(sel&&!on?'dim':'')+'" data-t="'+k+'">'+d+'<circle class="tb '+(on?'hl pulse':'')+'" cx="'+x+'" cy="'+y+'" r="38"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-size="15" class="'+(on?'hlt':'')+'">Table '+k+'</text></g>';}
+document.getElementById('svg').innerHTML=s;
+document.querySelectorAll('#svg g[data-t]').forEach(g=>g.onclick=()=>{sel=+g.dataset.t;draw();showTable()});}
+function showTable(){r.innerHTML='<div class="c on"><span>'+T[sel].join(', ')+'</span><span class="t">T'+sel+'</span></div>'}
+const norm=s=>s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9 ]/g," ").replace(/\s+/g," ").trim();
+const q=document.getElementById("q"),r=document.getElementById("r");
+q.oninput=()=>{const v=norm(q.value);r.innerHTML="";sel=0;
+if(v.length<2){draw();return}
+const parts=v.split(" ");
+const m=G.filter(g=>{const n=norm(g.n);return parts.every(p=>n.includes(p))}).slice(0,8);
+if(!m.length){r.innerHTML='<p class="m">Name not found. Please ask our usher for help 💛</p>';draw();return}
+sel=m[0].t;
+m.forEach(g=>{const d=document.createElement("div");d.className="c"+(g.t==sel?" on":"");
+d.innerHTML='<span></span><span class="t">Table '+g.t+'</span>';d.firstChild.textContent=g.n;
+d.onclick=()=>{sel=g.t;[...r.children].forEach(c=>c.classList.remove("on"));d.classList.add("on");draw()};r.appendChild(d)});
+draw()};
+draw();
+</script></body></html>
